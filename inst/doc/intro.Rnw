@@ -1,0 +1,227 @@
+\documentclass[11pt]{article}
+\usepackage[pdftex]{graphicx}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\addtolength{\textwidth}{1in}
+\addtolength{\oddsidemargin}{-.5in}
+\setlength{\evensidemargin}{\oddsidemargin}
+
+\SweaveOpts{keep.source=TRUE, fig=FALSE}
+%\VignetteIndexEntry{intro}
+%\VignetteDepends{rpart}
+%\VignetteDepends{parallel}
+\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE, width=7, height=4.5}
+\newcommand{\myfig}[1]{\resizebox{\textwidth}{!}
+                        {\includegraphics{#1.pdf}}}
+\def\tree{\texttt{tree}}
+\def\GPLTR{\texttt{GPLTR}}
+\def\splus{S-Plus}
+\newcommand{\Co}[1]{\texttt{#1}}
+
+\title {An Introduction to the GPLTR package}
+\author{Cyprien Mbogning\\
+          Inserm UNIT 669, France}
+\date{\today}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\maketitle
+\tableofcontents
+<<echo=FALSE>>=
+options(continue = "  ", width = 60)
+options(SweaveHooks=list(fig=function() par(mar = c(4.1, 4.1, 0.1, 1.1))))
+pdf.options(pointsize = 10)
+par(xpd = NA)  #stop clipping
+library(GPLTR)
+@
+
+\section{Introduction}
+This document is intended to give a short overview of
+the methods found in the {\GPLTR} package. The acronym {\GPLTR} is designed for
+ --- Generalized Partially Linear Tree-based Regression model ---.
+
+The {\GPLTR} programs build classification or regression models of a very
+general structure using a three stage procedure with several additional tools; the resulting model is an
+hybrid model combining a generalized linear model with an additional tree
+part on the same scale.  The  model was first proposed by Chen et al.\cite{chenPLTR2007} for genetic 
+epidemiology study studies in order to assess complex joint gene-gene and gene-environment 
+effects taking into account confounding variables. In practice, the GPLTR models represent 
+a new class of semi-parametric regression models that integrates the advantages  
+of generalized linear regression and tree-structure models. To our best knowledge, there is
+currently no implemented package dealing with this kind of model. The available classical tree-based 
+methods do not provide a way for controlling confounding factors outside the tree part (the final tree 
+is generally a mixture of confounders and explanatory variables lacking of clear interpretation and resulting in a distorted
+joint effect). 
+
+\section{GPLTR model}
+Denote $\mathbf{Y}$ the outcome of interest, $\mathbf{X}$ a set of confounding
+variables, and $\mathbf{G}$ the explanatory variables. 
+The model fitted inside the {\GPLTR} package is specified by:
+%
+\begin{equation}
+g\left( \mathbb{E}\left( \mathbf{Y}|\mathbf{X},\mathbf{G}\right) \right) =%
+\mathbf{X}'\theta +\beta _{T}F\left( T\left( \mathbf{G}\right) \right) ,
+\label{pltr}
+\end{equation}%
+where $g(\cdot)$ is a known link function (generalized linear model), 
+$F\left( T\left( \mathbf{Z}\right) \right) $ is a vector of indicator  variables
+representing the leaves of the tree $T\left( \mathbf{G}\right)$. 
+
+The variables considered in the linear part (confounding variables or variables we wish to control) of the model \ref{pltr}
+have a direct impact on the structure of the tree, beginning by the split criterion and ending by the pruning procedure.
+
+\section{Fitting methods}
+The method we used in this package to fit the model \ref{pltr} can be summarized into three major steps:
+\begin{description}
+\item[Step1] Fit the linear part and build a maximal tree within an iterative procedure by playing on several offsets terms.
+The nodes of the tree are splitted by maximizing a deviance criterion, while an intercept coefficient is fitted inside the node 
+using the corresponding glm with the linear part considered as offset.
+\item[Step2] In order to prune back the maximal tree obtained previously, we use a forward procedure to build a sequence of nested 
+subtrees.
+\item[Step3] The optimal tree is selected, using either a BIC criterion, a AIC criterion, a K-fold Cross-validation procedure on the
+underlying GPLTR models corresponding to the nested trees sequence. The original parametric bootstrap test procedure proposed by Chen et al.
+is also available.     
+\end{description}
+We further propose a procedure to test the joint effect of the selected tree while adjusting for confounders.
+The users are encouraged to read the recent paper of Mbogning et al. \cite{mbogningpltr2014} for a more thorough explanation about the model and the methods.
+
+\section{Illustration via several examples}
+
+In the following, we will present the results obtained on the publicly available "burn" Data Set
+(Times to Infection for Burn Patients from the book of Klein and Moeschberger \cite{kleinSURV2003}). This dataset comes
+from a study (Ichida et al.\cite{ichidaBURN1993}) that evaluates a protocol change in disinfectant practices for a cohort of $154$ patients.
+ A complete description of the data is also available inside the \GPLTR package documentation.  
+
+In this example, the dependent variable is the administration of prophylactic antibiotic treatment ($D2$: yes/no), the confounding variable 
+is the gender ($Z2$: male/female) and the potential explanatory variables are: ethnicity, severity of the burn as measured by percentage of 
+total surface area of body burned, burn site (head, buttocks, trunk, upper legs, lower legs, respiratory tract), and 
+type of burn (chemical, scald, electric, flame). In this analysis, we included gender as a confounding factor since this factor has already 
+been described as related to infections  among burn patients (Wisplinghoff et al. \cite{wisplinghoffRISK1999}). Such adjustment for confounders 
+cannot be performed within the classical CART framework.
+
+\begin{flushleft}
+\textbf{Results obtained with the classical CART algorithm}
+\end{flushleft}
+First of all, we have fitted a classical tree model on the dependent variable $D2$, using the CART algorithm \cite{breimanCART1984} 
+via the 'rpart' routines \cite{therneaurpart2013} of the R software:
+<<cart, fig=TRUE, include=FALSE>>=
+data(burn)
+cfit <- rpart(D2 ~ Z1  + Z2 + Z3 + Z4 + Z5 + Z6 + Z7 + Z8 + Z9 
+                  + Z10 + Z11, data = burn, method = "class")
+par(mar = rep(0.1, 4))
+plot(cfit, uniform = TRUE)
+ text(cfit, xpd = TRUE, use.n = TRUE)
+@
+
+Figure (\ref{cartt}) represents the tree obtained using the classical CART algorithm. 
+\begin{figure}
+  \myfig{intro-cart}
+  \caption{Tree obtained on the burn dataset with rpart.}
+  \label{cartt}
+\end{figure}
+
+\begin{flushleft}
+\textbf{Results obtained with our proposed method within the {\GPLTR} package}
+\end{flushleft}
+A logistic partially linear tree-based regression model is fitted by using our proposed method:
+<<gpltr, fig=TRUE, include=FALSE>>=
+#setting the parameters
+args.rpart <- list(minbucket = 10, maxdepth = 4, cp = 0)
+family <- "binomial"
+X.names = "Z2"
+Y.name = "D2"
+G.names = c('Z1','Z3','Z4','Z5','Z6','Z7','Z8','Z9','Z10','Z11')
+# Build the tree with an adjustment  on gender (Z2)
+fit_pltr <- pltr.glm(burn, Y.name, X.names, G.names, args.rpart = 
+                      args.rpart, family = family,iterMax =8, iterMin = 6,
+                        verbose = TRUE)
+tree_select <- best.tree.BIC.AIC(xtree = fit_pltr$tree,burn,Y.name, 
+                        X.names, G.names, family = family, verbose = FALSE)
+summary(tree_select$tree$BIC)
+
+summary(tree_select$fit_glm$BIC)
+
+par(mfrow = c(1,2), mar = rep(0.1, 4))
+plot(fit_pltr$tree, uniform = TRUE, margin = 0.05)
+plot(tree_select$tree$BIC, uniform = TRUE, margin = 0.05)
+text(tree_select$tree$BIC, xpd = TRUE)
+@
+ 
+ \begin{figure}
+   \myfig{intro-gpltr}
+   \caption{The figure on the left is the maximal tree obtained with pltr.glm; the    figure on the right is
+   a pruned tree via a BIC criterion}
+   \label{pltrr}
+ \end{figure}
+
+\begin{itemize}
+\item The underlying method behind the 'binomial' family above is a new one, different from those implemented inside the \Co{rpart} package. The splitting criterion is based on 
+a logistic deviance criterion considering the linear part as offset (See Mbogning et al.\cite{mbogningpltr2014}). 
+\item The child nodes of node $x$ are always $2x$ and $2x+1$, to help
+in navigating the tree summary (compare the summary to figure \ref{pltrr}).
+\item They are many Items in the tree summary list:
+\begin{itemize}
+\item the complexity table 
+\item the variable importance
+\item the node number
+\item the number of cases within the node
+\item the number of events (number of cases with attribute 1) inside the node
+\item the logistic intercept coefficient fitted inside the node, which represents the summary statistic of the node. This coefficient represents the predicted value of the node. that's the main difference with a conventional tree where the predicted value is the modal class of the node.
+\item the logistic deviance of the previous model inside the node which is used as the splitting criterion
+\end{itemize}
+\item * indicates that the node is terminal.
+\item the first split is on the Percentage of total surface area burned ($Z_4$). $64$ individuals with $ Z_4 < 15.5 $ go to the left while the remaining $90$ go to the right. The split with the maximum number of events is always on the right.
+\item The improvement listed is the change in deviance for the split, ie., $D(parent) - (D(left son) + D(right son))$, where $D$ is the deviance operator. This is similar to a likelihood ratio test statistic. 
+\item the other nodes can be described similarly.
+\end{itemize}
+
+For all the two models (tree with rpart (Fig \ref{cartt}) and the tree with our proposed procedure (Fig \ref{pltrr})), the ???rst split is due to the percentage of total surface area burned ($(< 16.5\%, > 16.5\%$) for \Co{rpart} and ($< 15.5\%, > 15.5\% $) for the proposed method). The subsequent splits are di???erent between patients having a high or low percentage of total
+surface area burned. The classical rpart model shows only one split whereas our proposed PLTR model shows two splits. With
+the exception of CART model where no split occurs, the subsequent split for the group of patients with a low percentage of area burned is due to the initial treatment (routine bathing/body cleansing). For high percentage of surface area burned, the split for the two
+models is due to the respiratory tract damage. Our proposed procedure identi???es other splits due to the treatment and the buttock burns. In particular, we observed that the group of patients with
+a high percentage of surface area of body burned, without tract respiratory damage, buttock injury and without routine bathing shows a lower proportion of prophylactic antibiotics
+administration. This group is not detected by the original PLTR method. It is worth noting that the confounding factor $Z2$ is significant with a higher proportion of prophylactic antibiotics administration among women.
+
+The particularity of the PLTR model is that in addition with the tree part, the final model is a classical logistic model with new risk factors emerging from the tree part. The summary of the final logistic model is presented within the R code above. We can see for example that the new risk factor constitute by individuals sharing the attributes $Z4 < 15.5$ and $Z1<0.5$ is higly significant. Similar interpretation can be made for other factors.
+
+\section{Compute the generalization error of the procedure}
+We can further compute the generalization error of the procedure. This can be computed via the function \Co{best.tree.CV} which can also provide the best tree based on a K-fold cross-validation procedure.
+<<>>=
+tree_selected <- best.tree.CV(fit_pltr$tree, burn, Y.name, X.names, 
+                  G.names, family = family, args.rpart = args.rpart,
+                  epsi = 0.001, iterMax = 15, iterMin = 8, ncv = 10,
+                  verbose = FALSE) 
+
+tree_selected$CV_ERROR
+
+Bic_size <- sum(tree_select$tree$BIC$frame$var == '<leaf>')
+## Bic_size <- tree_select$best_index[[1]]
+
+CV_ERROR_BIC <- tree_selected$CV_ERROR[[2]][Bic_size]
+
+CV_ERROR_BIC
+@
+
+\section{Test the joint effect of the selected tree while adjusting for confounders.}
+We can also test the joint effect of the selected tree after adjusting for the confounding variable
+<<>>=
+args.parallel = list(numWorkers = 1, type = "PSOCK")
+index = Bic_size
+# p_value <- p.val.tree(xtree = fit_pltr$tree, data_pltr, Y.name, X.names,
+#             G.names, B = 1000, args.rpart = args.rpart, epsi = 1e-3, 
+#             iterMax = 15, iterMin = 8, family = family, LB = FALSE, 
+#             args.parallel = args.parallel, index = index, verbose =
+#             FALSE)
+# p_value$P.value
+@
+\bibliographystyle{plain}
+\bibliography{Bibliopltr}
+
+\end{document}
