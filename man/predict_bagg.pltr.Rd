@@ -30,14 +30,25 @@ the cutoff value for binary prediction
 }
 
 \value{
-A list with three elements
-\item{PRED_IND }{
+A list with 8 elements
+\item{FINAL_PRED_IND1 }{
 A vector with the final prediction of each individual of the testing data by the bagging procedure (the modal prediction).
 }
-\item{PRED_IND}{
-a matrix with the prediction of the testing data individuals with each bagging PLTR model (column by column)
+\item{FINAL_PRED_IND2 }{
+A vector with the final prediction of each individual of the testing data by the bagging procedure using the mean estimated probability.
 }
-\item{PRED_ERROR}{the estimated error of the Bagging procedure on the test sample.
+\item{PRED_IND_MAT }{
+A matrix containing the predicted values of the test sample (predictor by predictor in the bagging sequence.) column by column.
+}
+\item{PRED_ERROR1}{the estimated error of the Bagging procedure on the test sample using \code{FINAL_PRED_IND1}.
+}
+\item{PRED_ERROR2}{the estimated error of the Bagging procedure on the test sample using \code{FINAL_PRED_IND2}.
+}
+\item{PROB_MAT}{A matrix of estimated probabilities on testing sample individuals by each predictor of the bagging sequence.
+}
+\item{CONF1}{The confusion matrix using \code{FINAL_PRED_IND1}
+}
+\item{CONF2}{The confusion matrix using \code{FINAL_PRED_IND2}
 }
 }
 

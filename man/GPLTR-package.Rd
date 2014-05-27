@@ -13,8 +13,8 @@ generalized linear model with an additional tree part on the same scale.
 \tabular{ll}{
 Package: \tab GPLTR\cr
 Type: \tab Package\cr
-Version: \tab 0.85\cr
-Date: \tab 2014-04-22\cr
+Version: \tab 0.95\cr
+Date: \tab 2014-05-27\cr
 License: \tab GPL(>=2.0)\cr
 }
 

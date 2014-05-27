@@ -10,45 +10,40 @@ tree2indicators <- function(fit)
   list_leaves = lapply(leaves, function(u) return(u[-1]))
   
   
-  #  Replace "<" by "<c("
+  #  Replace "=" by "=="
   list_leaves_1 = lapply(list_leaves, function(u)
   {
-    r = sapply(u, function(uu) return(sub("<","<c(", uu)))
+    r = sapply(u, function(uu) return(sub("=","==", uu)))
     return(r)
   })
-  #  Replace ">" by ">c(" 
+  #  Replace ">==" by ">="
   list_leaves_2 = lapply(list_leaves_1, function(u)
   {
-    r = sapply(u, function(uu) return(sub(">",">c(", uu)))
+    r = sapply(u, function(uu) return(sub(">==",">=", uu)))
     return(r)
   })
-  #  Replace "=" by "%in%c("
+  #  Replace "<==" by "<="
   list_leaves_3 = lapply(list_leaves_2, function(u)
   {
-    r = sapply(u, function(uu) return(sub("=","%in%c(", uu)))
+    r = sapply(u, function(uu) return(sub("<==","<=", uu)))
     return(r)
   })
-  #  Replace "<c(%in%" by "<="
+  #  Introduce is.element or factors
   list_leaves_4 = lapply(list_leaves_3, function(u)
   {
-    r = sapply(u, function(uu) return(sub("<c(%in%","<=", uu, fixed=T)))
-    return(r)
-  })
-  #  Replace ">c(%in%" by ">="
-  list_leaves_5 = lapply(list_leaves_4, function(u)
-  {
-    r = sapply(u, function(uu) return(sub(">c(%in%",">=", uu, fixed=T)))
-    return(r)
-  })
-  #  Replace the closure with ")"
-  list_leaves_6 = lapply(list_leaves_5, function(u)
-  { 
-    r = sapply(u, function(uu) return(paste(uu, "", sep = ")")))
+    r = sapply(u, function(uu) {
+      
+      if (grepl('==',uu)){
+        return(gsub("==", ",c('" , gsub("$", "'))", gsub("^", "is.element(", gsub(",", "','", uu))),fixed = T))
+      }
+      else
+        return(uu)
+    })
     return(r)
   })
   
   #	List of indicators
-  indicators = lapply(list_leaves_6, function(u)
+  indicators = lapply(list_leaves_4, function(u)
   {
     return(paste(u, collapse=" & "))
   })

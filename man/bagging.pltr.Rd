@@ -11,7 +11,7 @@ bagging procedure to agregate several PLTR models for accurate prediction
 bagging.pltr(xdata, Y.name, X.names, G.names, family = "binomial", 
 args.rpart,epsi = 0.001, iterMax = 15, iterMin = 8, LB = FALSE, 
 args.parallel = list(numWorkers = 10, type = "PSOCK"),
-Bag = 20, Pred_Data = data.frame(), verbose = TRUE)
+Bag = 20, Pred_Data = data.frame(), verbose = TRUE, doprune = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -57,23 +57,27 @@ The number of Bagging samples to consider
 An optional data frame to validate the bagging procedure (the test dataset)
 }
  \item{verbose}{Logical; TRUE for printing progress during the computation (helpful for debugging)}
+ \item{doprune}{
+a binary indicator with values TRUE or FALSE indicating weither the set of trees in the bagging procedure are pruned (by a \code{BIC} procedure) or not}
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-A list with six elements
-\item{IND_OOB }{A list of length \code{Bag} containing the Out Of Bag (OOB) individual for each PLTR model}
-\item{OOB_ERRORS }{A vector of length \code{Bag} containing  OOB error of each PLTR model }
-\item{OOB_ERROR }{The OOB error of the Bagging procedure}
+A list with ten elements
+\item{IND_OOB }{A list of length \code{Bag} containing the Out Of Bag (OOB) individuals for each PLTR model.}
+\item{EOOB }{The OOB error of the bagging procedure. }
+\item{OOB_ERROR }{The OOB error on the complete learning sample }
+\item{OOB_ERRORS_PBP }{A vector of length \code{Bag} containing  OOB error of each PLTR model in the bagging sequence.}
+\item{OOB_ERRORS_PBP }{The mean of \code{OOB_ERRORS_PBP}.}
 \item{Tree_BAG }{A list of length \code{Bag} containing the bagging trees}
 \item{Glm_BAG }{A list of length \code{Bag} containing the bagging pltr model; could be helpfull for prediction of new features.}
 \item{TEST }{A value of "000" if \code{Pred_Data} is not available. A list of three elements otherwise: \code{PRED_ERROR}: the estimated error of the Bagging procedure on the test sample; \code{PRED_IND}: a matrix with the prediction of the testing data individuals with each bagging PLTR model (column by column); \code{FINAL_PRED_IND}: A vector with the final prediction of each individual of the testing data by the bagging procedure (the modal prediction).}
 \item{Timediff}{The execution time of the bagging  procedure}
 }
-%\references{
-%% ~put references to the literature/web site here ~
-%}
+\references{
+ Leo Breiman:  Bagging Predictors. Machine Learning, 24, 123-140 (1996)
+}
 \author{
 Cyprien Mbogning
 }

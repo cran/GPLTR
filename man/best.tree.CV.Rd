@@ -58,8 +58,8 @@ a list of five elements:
  \item{best_index }{The size of the selected tree by the cross-validation procedure}
  \item{tree }{The selected tree by \code{CV}}
  \item{fit_glm}{The fitted gpltr models selected with  \code{CV} }
- \item{CV_ERROR}{The cross-validation error of the selected tree by the \code{CV} procedure and a
-       vector of cross-validation error of all the competing models}
+ \item{CV_ERRORS}{A list of two elements containing the cross-validation error of the selected tree by the \code{CV} procedure and a
+       vector of cross-validation errors of all the competing models}
  \item{Timediff}{The execution time of the \code{CV} procedure}
 }
 \references{
