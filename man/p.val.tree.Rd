@@ -9,9 +9,9 @@ Test weither the selected tree by either \code{BIC}, \code{AIC} or \code{CV} pro
 }
 \usage{
 p.val.tree(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpart = 
-list(minbucket = 40, maxdepth = 10, cp = 0), epsi = 0.001, iterMax = 15,
-iterMin = 8, family = "binomial", LB = FALSE, 
-args.parallel = list(numWorkers = 10, type = "PSOCK"), index = 4, verbose = TRUE)
+list(minbucket = 40, maxdepth = 10, cp = 0), epsi = 0.001, iterMax = 5,
+iterMin = 3, family = "binomial", LB = FALSE, 
+args.parallel = list(numWorkers = 1), index = 4, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,7 +25,7 @@ the data frame used to build xtree
 the name  of the dependent variable
 }
   \item{X.names}{
-the names of independent variables to consider in the linear part of the \code{glm}
+the names of independent confounding variables to consider in the linear part of the \code{glm}
 }
   \item{G.names}{
 the names of independent variables to consider in the tree part of the hybrid \code{glm}.
@@ -53,7 +53,7 @@ the glm family considered depending on the type of the dependent variable.
 a binary indicator with values TRUE or FALSE indicating weither the loading are balanced or not in the parallel computing
 }
   \item{args.parallel}{
-a list of two elements containing the number of workers and the type of parallelization to achieve 
+parameters of the parallelization. See \code{\link[parallel]{mclapply}} for more details. 
 }
   \item{index}{
 the size of the selected tree (by the functions \code{\link{best.tree.BIC.AIC}} or \code{\link{best.tree.CV}}) using one of the proposed criteria
@@ -87,34 +87,39 @@ Cyprien Mbogning
 \code{\link{best.tree.bootstrap}}, \code{\link{best.tree.permute}}
 }
 \examples{
-#load the data set
+\dontrun{
+## load the data set
 
-#data(data_pltr)
-#args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
-#family <- "binomial"
-#Y.name <- "Y"
-#X.names <- "G1"
-#G.names <- paste("G", 2:15, sep="")
+data(data_pltr)
+
+## set the parameters 
+
+args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
+family <- "binomial"
+Y.name <- "Y"
+X.names <- "G1"
+G.names <- paste("G", 2:15, sep="")
 
 ## build a maximal tree
 
-#fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
-#                     family = family,iterMax =15, iterMin = 8)
+fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
+                    family = family,iterMax = 5, iterMin = 3)
                      
 ##prunned back the maximal tree by BIC or AIC criterion
 
-#tree_select <- best.tree.BIC.AIC(xtree = fit_pltr$tree,data_pltr,Y.name, 
-#                            X.names, G.names, family = family)
+tree_select <- best.tree.BIC.AIC(xtree = fit_pltr$tree,data_pltr,Y.name, 
+                                 X.names, family = family)
                      
 ## Compute the p-value of the selected tree by BIC
 
-#args.parallel = list(numWorkers = 1, type = "PSOCK")
-#index = tree_select$best_index[[1]]
-#p_value <- p.val.tree(xtree = fit_pltr$tree, data_pltr, Y.name, X.names, G.names,
-#            B = 10, args.rpart = args.rpart, epsi = 1e-3, 
-#            iterMax = 15, iterMin = 8, family = family, LB = FALSE, 
-#            args.parallel = args.parallel, index = index)
+args.parallel = list(numWorkers = 10, type = "PSOCK")
+index = tree_select$best_index[[1]]
+p_value <- p.val.tree(xtree = fit_pltr$tree, data_pltr, Y.name, X.names, G.names,
+            B = 100, args.rpart = args.rpart, epsi = 1e-3, 
+            iterMax = 5, iterMin = 3, family = family, LB = FALSE, 
+            args.parallel = args.parallel, index = index)
+}
 }
 
 \keyword{ documentation }
-%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ test }

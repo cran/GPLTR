@@ -1,6 +1,8 @@
 ## Cross validation
-best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomial', args.rpart = list(cp=0,minbucket=20,maxdepth=10), epsi = 1e-3, iterMax = 15, iterMin = 8, ncv = 10, verbose = TRUE)
+best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomial', args.rpart = list(cp=0,minbucket=20,maxdepth=10), epsi = 1e-3, iterMax = 5, iterMin = 3, ncv = 10, verbose = TRUE)
 { 
+  time1 <- Sys.time()
+  if(!inherits(xtree, 'rpart')) stop('xtree must be an rpart object')
   tree_size1 <- sum(xtree$frame$var == "<leaf>")
   Ind_data <- 1:nrow(xdata)
   CV_ERRORS <- list()
@@ -28,12 +30,12 @@ best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomia
     if (tree_size > 1)
     {    
       MaxTreeSize <- min(tree_size, 10, tree_size1)
-      nested_trees = nested.trees(fit_pltr$tree, data_learn, Y.name, X.names, G.names, MaxTreeSize = MaxTreeSize, family = family, verbose = verbose)
+      nested_trees = nested.trees(fit_pltr$tree, data_learn, Y.name, X.names, MaxTreeSize = MaxTreeSize, family = family, verbose = verbose)
       
       fits_glm <-  lapply(nested_trees$leaves, function(uu)
       {
         xxtree = snip.rpart(fit_pltr$tree, toss = uu)
-        xfit = tree2glm(xxtree, data_learn, Y.name, X.names, G.names, family = family)
+        xfit = tree2glm(xxtree, data_learn, Y.name, X.names, family = family)
         return(xfit)  
       })
       
@@ -64,7 +66,7 @@ best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomia
   CV_ERRORS <- c(Vect_CV_ERROR0,vect_CV_ERRORS)
   CV_ERROR <- min(CV_ERRORS)
   best_index_CV <- which.min(CV_ERRORS)
-  nested_tree = nested.trees(xtree, xdata, Y.name, X.names, G.names, family = family, verbose = verbose)
+  nested_tree = nested.trees(xtree, xdata, Y.name, X.names, family = family, verbose = verbose)
   nested_trees_leaves <- append(nested_tree$leaves, c(1), after = 0)
   best_tree_CV = snip.rpart(xtree, toss = nested_trees_leaves[[best_index_CV]])
   if(best_index_CV > 1)
@@ -78,5 +80,7 @@ best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomia
     lm_CV = glm(xformula, data = xdata, family = family)
   }
   else lm_CV = glm(as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "))), data = xdata, family = family)
-  return(list(best_index = best_index_CV, tree = best_tree_CV, fit_glm = lm_CV , CV_ERRORS = list(CV_ERROR,CV_ERRORS)))
+  time2 <- Sys.time()
+  Timediff <- difftime(time2, time1)
+  return(list(best_index = best_index_CV, tree = best_tree_CV, fit_glm = lm_CV , CV_ERRORS = list(CV_ERROR,CV_ERRORS), Timediff = Timediff))
 }

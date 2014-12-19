@@ -1,6 +1,7 @@
-best.tree.permute <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpart = list(cp = 0, minbucket = 20, maxdepth = 10), epsi = 1e-3, iterMax = 15, iterMin = 8, family = "binomial", LEVEL = 0.05, LB = FALSE, args.parallel = list(numWorkers = 10, type = "PSOCK"), verbose = TRUE)
+best.tree.permute <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpart = list(cp = 0, minbucket = 20, maxdepth = 10), epsi = 1e-3, iterMax = 5, iterMin = 3, family = "binomial", LEVEL = 0.05, LB = FALSE, args.parallel = list(numWorkers = 1, type = "PSOCK"), verbose = TRUE)
 {
   time1 <- Sys.time()
+  if(!inherits(xtree, 'rpart')) stop('xtree have to be an rpart object!')
   ##	Fit null model
   fit_null = glm(as.formula(paste(Y.name, " ~ ", paste(X.names, collapse = "+"))), data = xdata, family = family)
   
@@ -62,7 +63,7 @@ best.tree.permute <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, ar
   ##	Nested trees
   wrapper2 <- function(list_xtree_xdata)
   {
-    return(nested.trees(xtree = list_xtree_xdata[[1]], xdata = list_xtree_xdata[[2]], Y.name = "Yp", X.names = X.names, G.names = G.names, MaxTreeSize = m, family = family, verbose = verbose)$diff_deviances)
+    return(nested.trees(xtree = list_xtree_xdata[[1]], xdata = list_xtree_xdata[[2]], Y.name = "Yp", X.names = X.names, MaxTreeSize = m, family = family, verbose = verbose)$diff_deviances)
   }
   
   List_xTrees_xDatas <- list()
@@ -82,7 +83,7 @@ best.tree.permute <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, ar
   
   
   ##	Observed statistics
-  obs_nested_trees = nested.trees(xtree, xdata, Y.name, X.names, G.names, MaxTreeSize = m, family = family, verbose = verbose)
+  obs_nested_trees = nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = m, family = family, verbose = verbose)
   obs_diff_deviances = obs_nested_trees$diff_deviances
   
   ##	Compute bootstrap p.values

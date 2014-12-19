@@ -1,5 +1,6 @@
 tree2indicators <- function(fit)
 {
+  if(!inherits(fit, 'rpart')) stop('fit have to be an rpart object')
   #	Retrieve splits for leaves
   leaves <- path.rpart(fit, nodes= row.names(fit$frame[ fit$frame$var == "<leaf>", ] ), print.it=FALSE )
   

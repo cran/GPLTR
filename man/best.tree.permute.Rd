@@ -10,8 +10,8 @@ a unified permutation test procedure to select and test at the same time the sel
 \usage{
 best.tree.permute(xtree, xdata, Y.name, X.names, G.names, B = 10,
  args.rpart = list(cp = 0, minbucket = 20, maxdepth = 10), epsi = 0.001,
- iterMax = 15, iterMin = 8, family = "binomial", LEVEL = 0.05, 
- LB = FALSE, args.parallel = list(numWorkers = 10, type = "PSOCK"), verbose = TRUE)
+ iterMax = 5, iterMin = 3, family = "binomial", LEVEL = 0.05, 
+ LB = FALSE, args.parallel = list(numWorkers = 1, type = "PSOCK"), verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -56,7 +56,7 @@ the level of the test
 a binary indicator with values TRUE or FALSE indicating weither the loading is balanced or not in the parallel computing. It is useless on a windows platform.
 }
   \item{args.parallel}{
-a list of two elements containing the number of workers and the type of parallelization to achieve
+parameters of the parallelization. See \code{\link[parallel]{mclapply}} for more details.
 }
  \item{verbose}{Logical; TRUE for printing progress during the computation (helpful for debugging)}
 }
@@ -88,27 +88,33 @@ Cyprien Mbogning
 \code{\link{p.val.tree}}, \code{\link{best.tree.bootstrap}}
 }
 \examples{
+\dontrun{
 ##load the data set
-#data(data_pltr)
-#args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
-#family <- "binomial"
-#Y.name <- "Y"
-#X.names <- "G1"
-#G.names <- paste("G", 2:15, sep="")
+
+data(data_pltr)
+
+## set the parameters
+
+args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
+family <- "binomial"
+Y.name <- "Y"
+X.names <- "G1"
+G.names <- paste("G", 2:15, sep="")
 
 ## build a maximal tree
 
-#fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
-#                     family = family,iterMax =15, iterMin = 8)
+fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
+                     family = family,iterMax = 5, iterMin = 3)
                      
 ## select an test the selected tree by a permutation test procedure
-#args.parallel = list(numWorkers = 1, type = "PSOCK")
 
-#best_permute <- best.tree.permute(fit_pltr$tree, data_pltr, Y.name, X.names,
-#  G.names, B = 10, args.rpart = args.rpart, epsi = 0.001, iterMax = 15,              
-#             iterMin = 8, family = family, LEVEL = 0.05,LB = FALSE, 
-#                                   args.parallel = args.parallel)
+args.parallel = list(numWorkers = 1, type = "PSOCK")
+
+best_permute <- best.tree.permute(fit_pltr$tree, data_pltr, Y.name, X.names,
+  G.names, B = 10, args.rpart = args.rpart, epsi = 0.001, iterMax = 5,              
+             iterMin = 3, family = family, LEVEL = 0.05,LB = FALSE, 
+}                                   args.parallel = args.parallel)
 }
 
 \keyword{ documentation }
-%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ test }

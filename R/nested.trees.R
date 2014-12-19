@@ -1,5 +1,6 @@
-nested.trees <- function(xtree, xdata, Y.name, X.names, G.names, MaxTreeSize = NULL, family = "gaussian", verbose = TRUE)
+nested.trees <- function(xtree, xdata, Y.name, X.names, MaxTreeSize = NULL, family = "binomial", verbose = TRUE)
 {
+  if(!inherits(xtree, 'rpart')) stop('xtree have to be an rpart object!')
   ##	Nodes of the tree
   nodes = as.numeric(rownames(xtree$frame))
   
@@ -31,7 +32,7 @@ nested.trees <- function(xtree, xdata, Y.name, X.names, G.names, MaxTreeSize = N
   
   deviance_null = deviance(fit_null)
   
-  fit_pltr_glm_given_tree = tree2glm(nested_trees[[j]], xdata, Y.name, X.names, G.names, family = family)
+  fit_pltr_glm_given_tree = tree2glm(nested_trees[[j]], xdata, Y.name, X.names, family = family)
   
   deviances[j] = deviance(fit_pltr_glm_given_tree)
   
@@ -64,7 +65,7 @@ nested.trees <- function(xtree, xdata, Y.name, X.names, G.names, MaxTreeSize = N
       {
         List_leaves[[i]] = current_leaves
         current_tree = snip.rpart(xtree, toss = current_leaves)
-        current_fit_pltr_lm_given_tree = tree2glm(current_tree, xdata, Y.name, X.names, G.names, family = family)
+        current_fit_pltr_lm_given_tree = tree2glm(current_tree, xdata, Y.name, X.names, family = family)
         Vect_deviances[i] = deviance(current_fit_pltr_lm_given_tree)
         i = i+1
       }

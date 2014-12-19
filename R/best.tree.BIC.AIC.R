@@ -1,10 +1,11 @@
-best.tree.BIC.AIC <- function(xtree, xdata, Y.name, X.names, G.names, family = "binomial", verbose = TRUE)
+best.tree.BIC.AIC <- function(xtree, xdata, Y.name, X.names, family = "binomial", verbose = TRUE)
 {
   time1 <- Sys.time()
+  if(!inherits(xtree, 'rpart')) stop('xtree have to be an rpart object!')
   tree_size <- sum(xtree$frame$var == "<leaf>")    
   MaxTreeSize <- min(tree_size,10)
   
-  nested_trees = nested.trees(xtree, xdata, Y.name, X.names, G.names,MaxTreeSize = MaxTreeSize, family = family, verbose = verbose)
+  nested_trees = nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = MaxTreeSize, family = family, verbose = verbose)
   dev = c(nested_trees$null_deviance, nested_trees$deviances)
   
   # Compute BIC and AIC

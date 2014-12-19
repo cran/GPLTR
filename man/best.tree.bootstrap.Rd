@@ -10,8 +10,8 @@ a parametric bootstrap procedure to select and test at the same time the selecte
 \usage{
 best.tree.bootstrap(xtree, xdata, Y.name, X.names, G.names, B = 10, BB = 10,
 args.rpart = list(cp = 0, minbucket = 20, maxdepth = 10), epsi = 0.001,
-iterMax = 15, iterMin = 8, family = "gaussian", LEVEL = 0.05, LB = FALSE,
-args.parallel = list(numWorkers = 10, type = "PSOCK"), verbose = TRUE)
+iterMax = 5, iterMin = 3, family = "binomial", LEVEL = 0.05, LB = FALSE,
+args.parallel = list(numWorkers = 1), verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -59,7 +59,7 @@ the level of the test
 a binary indicator with values TRUE or FALSE indicating weither the loading is balanced or not in the parallel computing. It is useless on a windows platform.
 }
   \item{args.parallel}{
-a list of two elements containing the number of workers and the type of parallelization to achieve
+parameters of the parallelization. See \code{\link[parallel]{mclapply}} for more details
 }
  \item{verbose}{Logical; TRUE for printing progress during the computation (helpful for debugging)}
 }
@@ -80,7 +80,7 @@ Chen, J., Yu, K., Hsing, A., Therneau, T.M.: A partially linear tree-based regre
  31, 238-251 (2007)
 }
 \author{
-Cyprien Mbogning
+Cyprien Mbogning and Wilson Toussile 
 }
 %\note{
 %%  ~~further notes~~
@@ -99,20 +99,21 @@ family <- "binomial"
 Y.name <- "Y"
 X.names <- "G1"
 G.names <- paste("G", 2:15, sep="")
-
+\dontrun{
 ## build a maximal tree
 
-#fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
-#            family = family,iterMax =15, iterMin = 8)
+fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, 
+   args.rpart = args.rpart, family = family, iterMax = 5, iterMin = 3)
                      
 ## select an test the selected tree by a parametric bootstrap procedure
-#args.parallel = list(numWorkers = 1, type = "PSOCK")
+args.parallel = list(numWorkers = 1, type = "PSOCK")
 
-#best_bootstrap <- best.tree.bootstrap(fit_pltr$tree, data_pltr, Y.name, X.names, 
-#  G.names, B = 10, BB = 10, args.rpart = args.rpart, epsi = 0.001, 
-#  iterMax = 15, iterMin = 8, family = family, LEVEL = 0.05,LB = FALSE, 
-#  args.parallel = args.parallel)
+best_bootstrap <- best.tree.bootstrap(fit_pltr$tree, data_pltr, Y.name, X.names, 
+  G.names, B = 10, BB = 10, args.rpart = args.rpart, epsi = 0.001, 
+  iterMax = 5, iterMin = 3, family = family, LEVEL = 0.05,LB = FALSE, 
+  args.parallel = args.parallel)
+  }
 }
 
 \keyword{ documentation }
-%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ test }

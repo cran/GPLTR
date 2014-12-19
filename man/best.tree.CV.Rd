@@ -10,7 +10,7 @@ this function  is set to prune back the maximal tree by using a K-fold \code{cro
 \usage{
 best.tree.CV(xtree, xdata, Y.name, X.names, G.names, family = "binomial", 
 args.rpart = list(cp = 0, minbucket = 20, maxdepth = 10), epsi = 0.001, 
-iterMax = 15, iterMin = 8, ncv = 10, verbose = TRUE)
+iterMax = 5, iterMin = 3, ncv = 10, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -60,7 +60,7 @@ a list of five elements:
  \item{fit_glm}{The fitted gpltr models selected with  \code{CV} }
  \item{CV_ERRORS}{A list of two elements containing the cross-validation error of the selected tree by the \code{CV} procedure and a
        vector of cross-validation errors of all the competing models}
- \item{Timediff}{The execution time of the \code{CV} procedure}
+ \item{Timediff}{The execution time of the \code{Cross-Validation} procedure}
 }
 \references{
 Mbogning, C., Perdry, H., Toussile, W., Broet, P.: A novel tree-based procedure for deciphering the genomic spectrum of clinical disease entities. Journal of Clinical Bioinformatics 4:6, (2014)
@@ -78,28 +78,35 @@ Cyprien Mbogning
 \code{\link{best.tree.BIC.AIC}}, \code{\link{pltr.glm}}
 }
 \examples{
+\dontrun{
 ##load the data set
-#data(data_pltr)
-#args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
-#family <- "binomial"
-#Y.name <- "Y"
-#X.names <- "G1"
-#G.names <- paste("G", 2:15, sep="")
 
-# build a maximal tree
+data(data_pltr)
 
-#fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
-#                     family = family,iterMax =15, iterMin = 8)
+## set the parameters
+
+args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
+family <- "binomial"
+Y.name <- "Y"
+X.names <- "G1"
+G.names <- paste("G", 2:15, sep="")
+
+## build a maximal tree
+
+fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
+                     family = family,iterMax = 5, iterMin = 3)
                      
 ##prunned back the maximal tree by a cross-validation procedure
 
-#tree_selected <- best.tree.CV(fit_pltr$tree, data_pltr, Y.name, X.names, G.names, 
-#     family = family, args.rpart = args.rpart, epsi = 0.001, iterMax = 15, 
-#     iterMin = 8, ncv = 10)
+tree_selected <- best.tree.CV(fit_pltr$tree, data_pltr, Y.name, X.names, G.names, 
+     family = family, args.rpart = args.rpart, epsi = 0.001, iterMax = 5, 
+     iterMin = 3, ncv = 10)
      
-#plot(tree_selected$tree, main = 'CV TREE')
-#text(tree_selected$tree, minlength = 0L, xpd = TRUE)
+plot(tree_selected$tree, main = 'CV TREE')
+text(tree_selected$tree, minlength = 0L, xpd = TRUE, cex = .6)
+}
 }
 
 \keyword{ documentation }
-%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ Machine Learning }
+

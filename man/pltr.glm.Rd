@@ -10,9 +10,9 @@ The \code{pltr.glm} function is designed to fit an hybrid glm model with  an add
 \usage{
 pltr.glm(data, Y.name, X.names, G.names, family = "binomial", 
     args.rpart = list(cp = 0, minbucket = 20, maxdepth = 10), 
-    epsi = 0.001, iterMax = 15, iterMin = 8, verbose = TRUE)
+    epsi = 0.001, iterMax = 5, iterMin = 3, verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{data}{
 a data frame containing the variables in the model
@@ -48,7 +48,7 @@ the minimum number of iteration to consider
  The \code{pltr.glm} function use an itterative procedure to fit the linear part of the \code{glm} and the tree part. The tree obtained at the convergence of the procedure is a maximal tree which overfits the data. It's then mandatory to prunned back this tree by using one of the proposed criteria (\code{BIC}, \code{AIC} and \code{CV}).
 }
 \value{A list with four elements:
- \item{fit }{the global glm fitted at the end of the algorithm}
+ \item{fit }{the glm fitted on the confounding factors at the end of the iterative algorithm}
  \item{tree }{the maximal tree obtained at the end of the algorithm}
  \item{nber_iter}{the number of iterations used by the algorithm}
  \item{Timediff}{The execution time of the iterative procedure}
@@ -62,33 +62,51 @@ Chen, J., Yu, K., Hsing, A., Therneau, T.M.: A partially linear tree-based regre
  31, 238-251 (2007)
 }
 \author{
-Cyprien Mbogning
+Cyprien Mbogning and Wilson Toussile
 }
-\note{ The tree obtained at the end of these itterative procedure usually ovrfits the data. It's therefore mendatory to use either \code{\link{best.tree.BIC.AIC}} or \code{\link{best.tree.CV}} to prunne back the tree.
+\note{ The tree obtained at the end of these itterative procedure usually overfits the data. It's therefore mendatory to use either \code{\link{best.tree.BIC.AIC}} or \code{\link{best.tree.CV}} to prunne back the tree.
 }
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link[rpart]{rpart}}
 }
 \examples{
-##load the data set
+data(burn)
+
+args.rpart <- list(minbucket = 10, maxdepth = 4, cp = 0, maxcompete = 0, 
+                    maxsurrogate = 0)
+ family <- "binomial"
+ X.names = "Z2"
+ Y.name = "D2"
+ G.names = c('Z1','Z3','Z4','Z5','Z6','Z7','Z8','Z9','Z10','Z11')
+ 
+pltr.burn <- pltr.glm(burn, Y.name, X.names, G.names, args.rpart = args.rpart,
+                   family = family, iterMax = 4, iterMin = 3, verbose = FALSE)
+
+
+\dontrun{
+## load the data set
 
 data(data_pltr)
+
+## set the parameters 
+
 args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
 family <- "binomial"
 Y.name <- "Y"
 X.names <- "G1"
 G.names <- paste("G", 2:15, sep="")
 
-## build a maximal tree (uncomment the following code)
+## build a maximal tree 
 
-#fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
-#                    family = family,iterMax =15, iterMin = 8)
+fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
+                    family = family,iterMax = 5, iterMin = 3)
                     
-#plot(fit_pltr$tree, main = 'MAXIMAL TREE')
-#text(fit_pltr$tree, minlength = 0L, xpd = TRUE)
+plot(fit_pltr$tree, main = 'MAXIMAL TREE')
+text(fit_pltr$tree, minlength = 0L, xpd = TRUE, cex = .6)
+}
 }
 
 \keyword{ documentation }
-%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ tree }
+\keyword{ Machine Learning }

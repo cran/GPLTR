@@ -9,7 +9,7 @@ this function  is set to prune back the maximal tree by using  the \code{BIC} or
 }
 \usage{
 best.tree.BIC.AIC(xtree, xdata, Y.name, X.names,
-   G.names, family = "binomial", verbose = TRUE)
+                  family = "binomial", verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,11 +23,9 @@ the dataset used to build the tree
 the name  of the dependent variable
 }
   \item{X.names}{
-the names of independent variables to consider in the linear part of the \code{glm}
+the names of independent confounding variables to consider in the linear part of the \code{glm}
 }
-  \item{G.names}{
-the names of independent variables to consider in the tree part of the hybrid \code{glm}.
-}
+
   \item{family}{
 the \code{glm} family considered depending on the type of the dependent variable.
 }
@@ -51,39 +49,64 @@ Akaike, H.: A new look at the statistical model identification. \code{IEEE Trans
 Schwarz, G.: Estimating the dimension of a model. \code{The Annals of Statistics} 6, 461-464 (1978)
 }
 \author{
-Cyprien Mbogning
+Cyprien Mbogning and Wilson Toussile
 }
-%\note{
-%%  ~~further notes~~
-%}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
  \code{\link{best.tree.CV}}, \code{\link{pltr.glm}}
 }
 \examples{
+data(burn)
+
+args.rpart <- list(minbucket = 10, maxdepth = 4, cp = 0, maxcompete = 0, 
+                    maxsurrogate = 0)
+ family <- "binomial"
+ X.names = "Z2"
+ Y.name = "D2"
+ G.names = c('Z1','Z3','Z4','Z5','Z6','Z7','Z8','Z9','Z10','Z11')
+ 
+pltr.burn <- pltr.glm(burn, Y.name, X.names, G.names, args.rpart = args.rpart,
+                   family = family, iterMax = 4, iterMin = 3, verbose = FALSE)
+
+## Prunned back the maximal tree using either the BIC or the AIC criterion
+
+pltr.burn_prun <- best.tree.BIC.AIC(xtree = pltr.burn$tree, burn, Y.name, 
+                                    X.names, family = family)
+
+## plot the BIC selected tree
+
+plot(pltr.burn_prun$tree$BIC, main = 'BIC selected tree')
+text(pltr.burn_prun$tree$BIC, xpd = TRUE, cex = .6, col = 'blue')
+
+\dontrun{
 ##load the data set
-#data(data_pltr)
-#args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
-#family <- "binomial"
-#Y.name <- "Y"
-#X.names <- "G1"
-#G.names <- paste("G", 2:15, sep="")
+
+data(data_pltr)
+
+## Set the parameters
+
+args.rpart <- list(minbucket = 40, maxdepth = 10, cp = 0)
+family <- "binomial"
+Y.name <- "Y"
+X.names <- "G1"
+G.names <- paste("G", 2:15, sep="")
 
 ## build a maximal tree
 
-#fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
-#                     family = family,iterMax =15, iterMin = 8)
+fit_pltr <- pltr.glm(data_pltr, Y.name, X.names, G.names, args.rpart = args.rpart, 
+                     family = family,iterMax = 5, iterMin = 3)
                      
 ##prunned back the maximal tree by BIC or AIC criterion
 
-#tree_select <- best.tree.BIC.AIC(xtree = fit_pltr$tree,data_pltr,Y.name, 
-#                            X.names, G.names, family = family)
+tree_select <- best.tree.BIC.AIC(xtree = fit_pltr$tree,data_pltr,Y.name, 
+                                 X.names, family = family)
                             
-#plot(tree_select$tree$BIC, main = 'BIC TREE')
-#text(tree_select$tree$BIC, minlength = 0L, xpd = TRUE)
+plot(tree_select$tree$BIC, main = 'BIC TREE')
+text(tree_select$tree$BIC, minlength = 0L, xpd = TRUE, cex = .6)
+
+}
 }
 
 \keyword{ documentation }
-%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ tree }

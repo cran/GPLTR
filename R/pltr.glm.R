@@ -1,4 +1,4 @@
-pltr.glm <- function(data, Y.name, X.names, G.names, family = 'binomial', args.rpart = list(cp=0,minbucket=20,maxdepth=10), epsi = 1e-3, iterMax = 15, iterMin = 8, verbose = TRUE)
+pltr.glm <- function(data, Y.name, X.names, G.names, family = 'binomial', args.rpart = list(cp=0, minbucket=20, maxdepth=10), epsi = 1e-3, iterMax = 5, iterMin = 3, verbose = TRUE)
  { 
   time1 <- Sys.time()
   
@@ -63,9 +63,9 @@ pltr.glm <- function(data, Y.name, X.names, G.names, family = 'binomial', args.r
   if(verbose)
     { 
      cat("End of iteration process\n")
-     cat("Number of iterations: ", nber_iter, "\n\n")
+     cat("Number of iterations: ", nber_iter - 1, "\n\n")
     }
   time2 <- Sys.time()
   Timediff <- difftime(time2, time1)
-  return(list(fit = fit_lm_update, tree = fit_tree, nber_iter = nber_iter, Timediff = Timediff))
+  return(list(fit = fit_lm_update, tree = fit_tree, nber_iter = nber_iter - 1, Timediff = Timediff))
 }

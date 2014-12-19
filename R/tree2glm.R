@@ -1,5 +1,6 @@
-tree2glm <- function(xtree, xdata, Y.name, X.names, G.names, family = "gaussian")
+tree2glm <- function(xtree, xdata, Y.name, X.names, family = "binomial")
 {
+  if(!inherits(xtree, 'rpart')) stop('xtree have to be an rpart object!')
   indicators_tree = sapply(tree2indicators(xtree), function(u) return(paste("as.integer(", u, ")")))
   
   nber_indicators = length(indicators_tree)

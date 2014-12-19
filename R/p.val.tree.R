@@ -1,5 +1,6 @@
-p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpart = list(minbucket = 40, maxdepth = 10, cp = 0), epsi = 1e-3, iterMax = 15, iterMin = 8, family = "binomial", LB = FALSE, args.parallel = list(numWorkers = 10, type = "PSOCK"), index = 4, verbose = TRUE)
+p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpart = list(minbucket = 40, maxdepth = 10, cp = 0), epsi = 1e-3, iterMax = 5, iterMin = 3, family = "binomial", LB = FALSE, args.parallel = list(numWorkers = 1), index = 4, verbose = TRUE)
 { 
+  if(!inherits(xtree, 'rpart')) stop('xtree have to be an rpart object!')
   if (index <= 1) stop ("The test procedure is not available for a root tree")
   time1 <- Sys.time()
   ##	Fit null model
@@ -73,7 +74,7 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   ##	Nested trees
   wrapper2 <- function(list_xtree_xdata)
   {
-    return(nested.trees(xtree = list_xtree_xdata[[1]], xdata = list_xtree_xdata[[2]], Y.name = "Yb", X.names = X.names, G.names = G.names, MaxTreeSize = m, family = family, verbose = verbose)$diff_deviances)
+    return(nested.trees(xtree = list_xtree_xdata[[1]], xdata = list_xtree_xdata[[2]], Y.name = "Yb", X.names = X.names, MaxTreeSize = m, family = family, verbose = verbose)$diff_deviances)
   }
   
   List_xTrees_xDatas <- list()
@@ -88,7 +89,7 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   List_Diff_deviances <- mclapply(List_xTrees_xDatas, wrapper2, mc.cores = getOption("mc.cores", numWorkers), mc.preschedule = LB, mc.silent = TRUE)
   
   ##	Observed statistics
-  obs_nested_trees = nested.trees(xtree, xdata, Y.name, X.names, G.names, MaxTreeSize = m, family = family, verbose = verbose)
+  obs_nested_trees = nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = m, family = family, verbose = verbose)
   obs_diff_deviances = obs_nested_trees$diff_deviances
   Diff_deviances <- matrix(unlist(List_Diff_deviances), nrow = m - 1, byrow = FALSE)
   
