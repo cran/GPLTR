@@ -16,49 +16,49 @@ pltr.glm <- function(data, Y.name, X.names, G.names, family = 'binomial', args.r
   #	Initial fit 
   fit0 <- glm(as.formula(paste(Y.name, "~ -1+", paste(X.names, collapse=" + "))), data = data, family = family)
   
-  hat_gamma = fit0$coef
+  hat_gamma <- fit0$coef
   
   #	Iterations
-  diff_norm_gamma = 10 # Valeur arbitraire
+  diff_norm_gamma <- 10 # Valeur arbitraire
   
   ## Number of iterations
-  nber_iter = 1
+  nber_iter <- 1
   
-  ## Gérer le produit matriciel
-  if(length(X.names) > 1) product = "%*%" 
-  else product = "*"
+  ## taking into account the matricial product
+  if(length(X.names) > 1) product <- "%*%" 
+  else product <- "*"
   
   if(verbose) cat("Iteration process...\n\n")
   
   while((diff_norm_gamma>0) & ((nber_iter<=iterMin) | (diff_norm_gamma>=epsi)) & (nber_iter<=iterMax))
   {
     #	1.a : fit tree
-    fit_tree = rpart(as.formula(paste(Y.name, " ~ ", paste(G.names, collapse=" + "), paste("+ offset(offsetX)"))), data = eval(parse(text = paste("data.frame(data, offsetX = as.matrix(data[,X.names])", product, "hat_gamma)"))), method = method, control = args.rpart)
+    fit_tree <- rpart(as.formula(paste(Y.name, " ~ ", paste(G.names, collapse=" + "), paste("+ offset(offsetX)"))), data = eval(parse(text = paste("data.frame(data, offsetX = as.matrix(data[,X.names])", product, "hat_gamma)"))), method = method, control = args.rpart)
     
     #	1.b : fit linear model
-    indicators_tree = sapply(tree2indicators(fit_tree), function(u) return(paste("as.integer(", u, ")")))
+    indicators_tree <- sapply(tree2indicators(fit_tree), function(u) return(paste("as.integer(", u, ")")))
     
-    nber_indicators = length(indicators_tree)
+    nber_indicators <- length(indicators_tree)
     
-    fit_lm = glm(as.formula(paste(Y.name, "~ ", paste(indicators_tree[-nber_indicators], collapse = "+"), paste("+ offset(offsetX)"))), eval(parse(text = paste("data.frame(data, offsetX = as.matrix(data[,X.names])", product, "hat_gamma)"))), family = family)
+    fit_lm <- glm(as.formula(paste(Y.name, "~ ", paste(indicators_tree[-nber_indicators], collapse = "+"), paste("+ offset(offsetX)"))), eval(parse(text = paste("data.frame(data, offsetX = as.matrix(data[,X.names])", product, "hat_gamma)"))), family = family)
     
     #	1.c : Update the estimate of gamma
-    hat_beta = fit_lm$coef
+    hat_beta <- fit_lm$coef
     
-    offsetZ = with(data, eval(parse(text = paste(hat_beta, c(1, indicators_tree[-nber_indicators]), collapse = " + ", sep="*")))) ##
+    offsetZ <- with(data, eval(parse(text = paste(hat_beta, c(1, indicators_tree[-nber_indicators]), collapse = " + ", sep="*")))) ##
     
-    fit_lm_update = glm(as.formula(paste(Y.name, "~ -1 + ", paste(X.names, collapse = " + "), paste("+ offset(offsetZ)"))), data = data.frame(data, offsetZ = offsetZ), family = family)
+    fit_lm_update <- glm(as.formula(paste(Y.name, "~ -1 + ", paste(X.names, collapse = " + "), paste("+ offset(offsetZ)"))), data = data.frame(data, offsetZ = offsetZ), family = family)
     
-    hat_gamma_update = fit_lm_update$coef
+    hat_gamma_update <- fit_lm_update$coef
     
     #	2 : Stop conditions
-    diff_norm_gamma = .norm2(hat_gamma_update - hat_gamma)
+    diff_norm_gamma <- .norm2(hat_gamma_update - hat_gamma)
     
-    hat_gamma = hat_gamma_update
+    hat_gamma <- hat_gamma_update
     
     ##	Number of iterations
     if(verbose) cat("Iteration ", nber_iter, "in PLTR; Diff_norm_gamma = ", diff_norm_gamma, "\n")
-    nber_iter = nber_iter + 1
+    nber_iter <- nber_iter + 1
   }
   if(verbose)
     { 

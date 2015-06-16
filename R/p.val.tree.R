@@ -4,15 +4,15 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   if (index <= 1) stop ("The test procedure is not available for a root tree")
   time1 <- Sys.time()
   ##	Fit null model
-  fit_null = glm(as.formula(paste(Y.name, " ~ ", paste(X.names, collapse = "+"))), data = xdata, family = family)
+  fit_null <- glm(as.formula(paste(Y.name, " ~ ", paste(X.names, collapse = "+"))), data = xdata, family = family)
   
   ##	Parameter of X covariates
-  hat_gamma0 = fit_null$coef
+  hat_gamma0 <- fit_null$coef
   
-  n = nrow(xdata)
+  n <- nrow(xdata)
   
   ##	For product
-  product = ifelse(length(X.names) == 1, "*", "%*%")
+  product <- ifelse(length(X.names) == 1, "*", "%*%")
   
   ##	Workers job
   MaxTreeList = list()
@@ -21,7 +21,7 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   if(family == "binomial")
   {
     Vect_PY1 <- fit_null$fitted
-    Yb_list = list()
+    Yb_list <- list()
     Yb_list <- lapply(1:B, function(j) 
     {
       return(sapply(Vect_PY1, function(xp) {
@@ -31,8 +31,8 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   }
   else
   {
-    df = length(hat_gamma0)
-    hat_sd2e = sqrt(sum(fit_null$residuals^2)/(n-df))
+    df <- length(hat_gamma0)
+    hat_sd2e <- sqrt(sum(fit_null$residuals^2)/(n-df))
     
     Yb_list <- list()
     Yb_list <- lapply(1:B, function(j)
@@ -44,13 +44,13 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   ##	Wrapper function to be executed in each machine
   wrapper <- function(xdata_b)
   {
-    pltr_lm_b = pltr.glm(xdata_b, Y.name = "Yb", X.names = X.names, G.names = G.names, args.rpart = args.rpart, epsi = epsi, iterMax = iterMax, iterMin = iterMin, family = family, verbose = verbose)
+    pltr_lm_b <- pltr.glm(xdata_b, Y.name = "Yb", X.names = X.names, G.names = G.names, args.rpart = args.rpart, epsi = epsi, iterMax = iterMax, iterMin = iterMin, family = family, verbose = verbose)
     
     return(pltr_lm_b$tree)
   }
   
   ##	Parallel job
-  numWorkers = args.parallel$numWorkers
+  numWorkers <- args.parallel$numWorkers
   cat("\n ncores = ", numWorkers, " for bootstrap !\n")
   
   List_xdatas <- lapply(Yb_list, function(Ybb) return(data.frame(Yb = Ybb, xdata)))
@@ -89,18 +89,18 @@ p.val.tree <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, args.rpar
   List_Diff_deviances <- mclapply(List_xTrees_xDatas, wrapper2, mc.cores = getOption("mc.cores", numWorkers), mc.preschedule = LB, mc.silent = TRUE)
   
   ##	Observed statistics
-  obs_nested_trees = nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = m, family = family, verbose = verbose)
-  obs_diff_deviances = obs_nested_trees$diff_deviances
+  obs_nested_trees <- nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = m, family = family, verbose = verbose)
+  obs_diff_deviances <- obs_nested_trees$diff_deviances
   Diff_deviances <- matrix(unlist(List_Diff_deviances), nrow = m - 1, byrow = FALSE)
   
   ##  Compute p.values by Wang et al. procedure using the moment estimator
-  mu = apply(Diff_deviances,1,mean)
-  sigma2 = apply(Diff_deviances,1,var) 
-  r = 4*mu/sigma2
-  bn = r*mu/2
-  trans_dev = r*Diff_deviances/2
-  trans_obs_dev = r*obs_diff_deviances/2
-  p_value_selected = 1 - pchisq(trans_obs_dev[index-1], df = bn[index-1])
+  mu <- apply(Diff_deviances,1,mean)
+  sigma2 <- apply(Diff_deviances,1,var) 
+  r <- 4*mu/sigma2
+  bn <- r*mu/2
+  trans_dev <- r*Diff_deviances/2
+  trans_obs_dev <- r*obs_diff_deviances/2
+  p_value_selected <- 1 - pchisq(trans_obs_dev[index-1], df = bn[index-1])
   
   time2 <- Sys.time()
   Timediff <- difftime(time2, time1)

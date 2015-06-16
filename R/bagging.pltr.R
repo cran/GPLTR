@@ -59,7 +59,7 @@ bagging.pltr <- function(xdata, Y.name, X.names, G.names, family = "binomial", a
       moda$weights <- NULL
       return(moda)
     })
-    #for(ii in 1:length(LIST_glm_Bag)){LIST_glm_Bag[[ii]]$data = NULL}
+
     ImpVarlist = lapply(MaxTreeList, function(ww){
       ww$variable.importance
     })
@@ -88,34 +88,18 @@ bagging.pltr <- function(xdata, Y.name, X.names, G.names, family = "binomial", a
   OOB_ERROR_PBP <- apply(OOB_ERRORS_PBP, 1, mean)
   } else OOB_ERROR_PBP <- mean(OOB_ERRORS_PBP)
   
-  ## Déterminer l'erreur sur l'échantillon d'apprentissage via le préditeur
-#   predict_glm_OOB <- lapply(LIST_glm_Bag,function(uw)
-#   {
-#     pred = predict.glm(uw, newdata = xdata, type = "response")
-#     return(sapply(thresshold, function(vv) as.numeric(pred >= vv)))
-#   })
-#   PRED_OOB_LEARN <- list()
-#   for(jj in seq(length(thresshold))){
-#     PRED_OOB_LEARN[[jj]] <- sapply(1:Bag, function(ww) predict_glm_OOB[[ww]][,jj])
-#   }
-#   
-#   FINAL_PRED_OOB <- lapply(PRED_OOB_LEARN, function(www) apply(www, 1, function(zzz) as.numeric(mean(zzz) > 0.5)))
-#   OOB_ERROR <- sapply(FINAL_PRED_OOB, function(uuu) mean( uuu != xdata[Y.name]))
-  
-  ## Déterminer l'erreur OOB pour chaque individu OOB
+    
+  ## Compute the OOB error for each OOB individual
   UNIQUE_IND_OOB <- sort(unique(unlist(IND_OOB)))
   LOST <- matrix(rep(0,length(UNIQUE_IND_OOB)*length(thresshold)), ncol = length(thresshold))
   j <- 0
   for(i in UNIQUE_IND_OOB){
     j <- j+1
     poslist <- sapply(IND_OOB, function(uu) is.element(i,uu))
-    ## récupérer les index où i est OOB
     IND_OOBi <- IND_OOB[poslist]
-    ## récupérer les prédicteurs où i est OOB
     PRED_OOBi <- predict_glm_OOB_PBP[poslist]
-    ## position de i dans chaque échantillon OOB
     posi <- sapply(IND_OOBi, function(w) which(w == i))
-    ## récupérer la prédiction de i pour chaque prédicteur et chaque valeur seuil
+
     vec_PREDi <- sapply(seq(length(posi)), function(ww) PRED_OOBi[[ww]][posi[ww],])
     if(length(thresshold) >1){
     PREDi <- apply(vec_PREDi, 1, function(zz) as.numeric(mean(zz) > 0.5))

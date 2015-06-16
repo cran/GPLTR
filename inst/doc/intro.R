@@ -80,8 +80,9 @@ text(pltr.burn_prun$tree$BIC, xpd = TRUE, cex = .4, col = 'blue' )
 
 
 ###################################################
-### code chunk number 4: intro.Rnw:264-278
+### code chunk number 4: intro.Rnw:264-279
 ###################################################
+set.seed(150)
 pltr.burn_CV <- best.tree.CV(pltr.burn$tree, burn, Y.name, X.names, 
                   G.names, family = family, args.rpart = args.rpart,
                   epsi = 0.001, iterMax = 15, iterMin = 8, ncv = 10,
@@ -99,7 +100,7 @@ CV_ERROR_BIC
 
 
 ###################################################
-### code chunk number 5: intro.Rnw:286-299 (eval = FALSE)
+### code chunk number 5: intro.Rnw:287-300 (eval = FALSE)
 ###################################################
 ## ## Use only one worker on a window plateform.
 ## 
@@ -121,6 +122,7 @@ CV_ERROR_BIC
 ###################################################
 getOption("SweaveHooks")[["fig"]]()
  ##  ?bagging.pltr
+set.seed(250)
 
 Bag.burn <-  bagging.pltr(burn, Y.name, X.names, G.names, family, 
               args.rpart,epsi = 0.01, iterMax = 4, iterMin = 3, 
@@ -162,7 +164,7 @@ text(TREE_BAG.burn[[6]], xpd = TRUE, cex = .6 )
 
 
 ###################################################
-### code chunk number 7: intro.Rnw:381-396
+### code chunk number 7: intro.Rnw:383-398
 ###################################################
 ## Use the bagging procedure to predict new features
 # ?predict_bagg.pltr

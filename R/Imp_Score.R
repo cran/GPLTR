@@ -88,12 +88,12 @@ VIMPBAG <- function(BAGGRES, data, Y.name){
   rm(ESP2)
   names(OCCUR) <- NAMESVAR
   colnames(IMPPER) <- paste('CUT', 1 : length(thres), sep = '')
-  IMPPER = as.list(data.frame(IMPPER))
-  IMPPER = lapply(IMPPER, function(vv){names(vv) = NAMESVAR ; return(vv)})
-  IMPPER = lapply(IMPPER, function(uu) sort(uu, decreasing = TRUE))
+  IMPPER <- as.list(data.frame(IMPPER))
+  IMPPER <- lapply(IMPPER, function(vv){names(vv) = NAMESVAR ; return(vv)})
+  IMPPER <- lapply(IMPPER, function(uu) sort(uu, decreasing = TRUE))
   colnames(Stderr) <- paste('CUT', 1 : length(thres), sep = '')
-  Stderr = as.list(data.frame(Stderr))
-  Stderr = lapply(Stderr, function(vv){names(vv) = NAMESVAR ; return(vv)}) 
+  Stderr <- as.list(data.frame(Stderr))
+  Stderr <- lapply(Stderr, function(vv){names(vv) = NAMESVAR ; return(vv)}) 
   OCCUR <- sort(OCCUR, decreasing = TRUE)
 
   depthBAG <- lapply(BAGGRES$Tree_BAG, function(treee) .depthvar(treee)$depth2)

@@ -79,7 +79,7 @@ A list with eleven elements
 \item{CUT}{The thresshold value used inside the bagging procedure}
 }
 \references{
-Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection (submitted 2014)
+Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection. Human Heredity (To appear) (2015)
 
  Leo Breiman:  Bagging Predictors. Machine Learning, 24, 123-140 (1996)
 }

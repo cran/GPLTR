@@ -50,7 +50,7 @@ A list of size the length of the thresshold vector, containing the final predict
 \item{PRED_ERROR_PBP}{A vector containing the mean of \code{PRED_ERRORS_PBP} for each thresshold value}
 }
 \references{
-Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection (submitted 2014)
+Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection. Human Heredity (To appear), (2015)
 }
 
 \author{

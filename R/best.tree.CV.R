@@ -30,18 +30,18 @@ best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomia
     if (tree_size > 1)
     {    
       MaxTreeSize <- min(tree_size, 10, tree_size1)
-      nested_trees = nested.trees(fit_pltr$tree, data_learn, Y.name, X.names, MaxTreeSize = MaxTreeSize, family = family, verbose = verbose)
+      nested_trees <- nested.trees(fit_pltr$tree, data_learn, Y.name, X.names, MaxTreeSize = MaxTreeSize, family = family, verbose = verbose)
       
       fits_glm <-  lapply(nested_trees$leaves, function(uu)
       {
-        xxtree = snip.rpart(fit_pltr$tree, toss = uu)
-        xfit = tree2glm(xxtree, data_learn, Y.name, X.names, family = family)
+        xxtree <- snip.rpart(fit_pltr$tree, toss = uu)
+        xfit <- tree2glm(xxtree, data_learn, Y.name, X.names, family = family)
         return(xfit)  
       })
       
       predict_glm <- lapply(fits_glm,function(u)
       {
-        pred = predict.glm(u, newdata = data_test, type = "response")
+        pred <- predict.glm(u, newdata = data_test, type = "response")
         return(as.numeric(pred>0.5))
       })
       
@@ -66,20 +66,21 @@ best.tree.CV <- function(xtree,xdata,Y.name, X.names, G.names, family = 'binomia
   CV_ERRORS <- c(Vect_CV_ERROR0,vect_CV_ERRORS)
   CV_ERROR <- min(CV_ERRORS)
   best_index_CV <- which.min(CV_ERRORS)
-  nested_tree = nested.trees(xtree, xdata, Y.name, X.names, family = family, verbose = verbose)
+  nested_tree <- nested.trees(xtree, xdata, Y.name, X.names, family = family, verbose = verbose)
   nested_trees_leaves <- append(nested_tree$leaves, c(1), after = 0)
-  best_tree_CV = snip.rpart(xtree, toss = nested_trees_leaves[[best_index_CV]])
+  best_tree_CV <- snip.rpart(xtree, toss = nested_trees_leaves[[best_index_CV]])
   if(best_index_CV > 1)
   {
-    indicators_tree = sapply(tree2indicators(best_tree_CV), function(u) return(paste("as.integer(", u, ")")))
+    indicators_tree <- sapply(tree2indicators(best_tree_CV), function(u) return(paste("as.integer(", u, ")")))
     
-    nber_indicators = length(indicators_tree)
+    nber_indicators <- length(indicators_tree)
     
-    xformula = as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "), "+", paste(indicators_tree[-nber_indicators], collapse = "+")))
+    xformula <- as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "), "+", paste(indicators_tree[-nber_indicators], collapse = "+")))
     
-    lm_CV = glm(xformula, data = xdata, family = family)
+    lm_CV <- glm(xformula, data = xdata, family = family)
+  }else{
+    lm_CV <- glm(as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "))), data = xdata, family = family)
   }
-  else lm_CV = glm(as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "))), data = xdata, family = family)
   time2 <- Sys.time()
   Timediff <- difftime(time2, time1)
   return(list(best_index = best_index_CV, tree = best_tree_CV, fit_glm = lm_CV , CV_ERRORS = list(CV_ERROR,CV_ERRORS), Timediff = Timediff))

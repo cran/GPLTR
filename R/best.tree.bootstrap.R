@@ -3,38 +3,36 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   time1<-Sys.time()
   if(!inherits(xtree, 'rpart')) stop('xtree have to be an rpart object!')
   ##  Fit null model
-  fit_null = glm(as.formula(paste(Y.name, " ~ ", paste(X.names, collapse = "+"))), data = xdata, family = family)
+  fit_null <- glm(as.formula(paste(Y.name, " ~ ", paste(X.names, collapse = "+"))), data = xdata, family = family)
   
   ##  Null deviance
   #   null_deviance = deviance(fit_null)
   
   ##	Parameter of X covariates
-  hat_gamma0 = fit_null$coef
+  hat_gamma0 <- fit_null$coef
   
-  n = nrow(xdata)
+  n <- nrow(xdata)
   
   ##	For product
-  product = ifelse(length(X.names) == 1, "*", "%*%")
+  product <- ifelse(length(X.names) == 1, "*", "%*%")
   
   ##	Workers job
-  MaxTreeList = list()
+  MaxTreeList <- list()
   
   
   if(family == "binomial")
   {
     Vect_PY1 <- fit_null$fitted
-    Yb_list = list()
+    Yb_list <- list()
     Yb_list <- lapply(1:B, function(j) 
     {
       return(sapply(Vect_PY1, function(xp) {
         return(sample(c(1, 0), 1, replace = TRUE, prob = c(xp, 1-xp)))
       }))
     })
-  }
-  else
-  {
-    df = length(hat_gamma0)
-    hat_sd2e = sqrt(sum(fit_null$residuals^2)/(n-df))
+  }else{
+    df <- length(hat_gamma0)
+    hat_sd2e <- sqrt(sum(fit_null$residuals^2)/(n-df))
     
     Yb_list <- list()
     Yb_list <- lapply(1:B, function(j)
@@ -46,13 +44,13 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   ##	Wrapper function to be executed in each machine
   wrapper <- function(xdata_b)
   {
-    pltr_lm_b = pltr.glm(xdata_b, Y.name = "Yb", X.names = X.names, G.names = G.names, args.rpart = args.rpart, epsi = epsi, iterMax = iterMax, iterMin = iterMin, family = family, verbose = verbose)
+    pltr_lm_b <- pltr.glm(xdata_b, Y.name = "Yb", X.names = X.names, G.names = G.names, args.rpart = args.rpart, epsi = epsi, iterMax = iterMax, iterMin = iterMin, family = family, verbose = verbose)
     
     return(pltr_lm_b$tree)
   }
   
   ##	Parallel job
-  numWorkers = args.parallel$numWorkers
+  numWorkers <- args.parallel$numWorkers
   cat("\n ncores = ", numWorkers, " for  inner layer bootstrap !\n")
   
   List_xdatas <- lapply(Yb_list, function(Ybb) return(data.frame(Yb = Ybb, xdata)))
@@ -91,8 +89,8 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   List_Diff_deviances <- mclapply(List_xTrees_xDatas, wrapper2, mc.cores = getOption("mc.cores", numWorkers), mc.preschedule = LB, mc.silent = TRUE)
   
   ##	Observed statistics
-  obs_nested_trees = nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = m, family = family, verbose = verbose)
-  obs_diff_deviances = obs_nested_trees$diff_deviances
+  obs_nested_trees <- nested.trees(xtree, xdata, Y.name, X.names, MaxTreeSize = m, family = family, verbose = verbose)
+  obs_diff_deviances <- obs_nested_trees$diff_deviances
   
   ##	Compute bootstrap p.values
   Diff_deviances <- matrix(unlist(List_Diff_deviances), nrow = m - 1, byrow = FALSE)
@@ -109,13 +107,13 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   
   ## Fit linear model for the selected tree
   
-  indicators_tree = sapply(tree2indicators(selected_tree), function(u) return(paste("as.integer(", u, ")")))
+  indicators_tree <- sapply(tree2indicators(selected_tree), function(u) return(paste("as.integer(", u, ")")))
   
-  nber_indicators = length(indicators_tree)
+  nber_indicators <- length(indicators_tree)
   
-  xformula = as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "), "+", paste(indicators_tree[-nber_indicators], collapse = "+")))
+  xformula <- as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "), "+", paste(indicators_tree[-nber_indicators], collapse = "+")))
   
-  selected_fit_glm = glm(xformula, data = xdata, family = family)
+  selected_fit_glm <- glm(xformula, data = xdata, family = family)
   
   selected_p_value <- vect_p_values[index_best_tree]
   
@@ -133,8 +131,8 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   }
   else
   {
-    df = length(hat_gamma0)
-    hat_sd2e = sqrt(sum(fit_null$residuals^2)/(n-df))
+    df <- length(hat_gamma0)
+    hat_sd2e <- sqrt(sum(fit_null$residuals^2)/(n-df))
     
     Yb_list <- list()
     Yb_list <- lapply(1:BB, function(j)
@@ -143,16 +141,9 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
     })
   }
   
-  ##  Wrapper function to be executed in each machine
-#   wrapper <- function(xdata_b)
-#   {
-#     pltr_lm_b = pltr.glm(xdata_b, Y.name = "Yb", X.names = X.names, G.names = G.names, args.rpart = args.rpart, epsi = epsi, iterMax = iterMax, iterMin = iterMin, family = family, verbose = verbose)
-#     
-#     return(pltr_lm_b$tree)
-#   }
-#   
+  
   ##	Parallel job
-  numWorkers = args.parallel$numWorkers
+  numWorkers <- args.parallel$numWorkers
   cat("\n ncores = ", numWorkers, " for  outer layer bootstrap !\n")
   
   List_xdatas <- lapply(Yb_list, function(Ybb) return(data.frame(Yb = Ybb, xdata)))
@@ -171,11 +162,6 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   
   BB_adj <- length(size_vect)  
   
-  ##	Nested trees
-  #   wrapper2 <- function(list_xtree_xdata)
-  #   {
-  #     return(nested.trees(xtree = list_xtree_xdata[[1]], xdata = list_xtree_xdata[[2]], Y.name = "Yb", X.names = X.names, G.names = G.names, MaxTreeSize = m, family = family)$diff_deviances)
-  #   }
   
   List_xTrees_xDatas <- list()
   List_xTrees_xDatas <-	lapply(1:BB_adj, function(j)
@@ -201,9 +187,10 @@ best.tree.bootstrap <- function(xtree, xdata, Y.name, X.names, G.names, B = 10, 
   
   if(! Tree_Selected) 
   {
-    selected_fit_glm = glm(as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "))), data = xdata, family = family)
+    selected_fit_glm <- glm(as.formula(paste(Y.name, "~", paste(X.names, collapse = " + "))), data = xdata, family = family)
   }
   time2 <- Sys.time()
   Timediff <- difftime(time2, time1)
+  
   return(list(selected_model = selected_fit_glm_tree, fit_glm = selected_fit_glm, Timediff = Timediff, comp_p_values = vect_p_values, Badj = B_adj, BBadj = BB_adj))
 }

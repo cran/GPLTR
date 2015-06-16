@@ -3,7 +3,7 @@ predict_bagg.pltr <- function(bag_pltr, Y.name, newdata, type = "response", thre
   
     predict_glm <- lapply(bag_pltr$Glm_BAG, function(uw)
     {
-      pred = predict.glm(uw, newdata = newdata, type = type)
+      pred <- predict.glm(uw, newdata = newdata, type = type)
       return(sapply(thresshold, function(wz) as.numeric(pred > wz)))
     })
     
@@ -27,7 +27,7 @@ predict_bagg.pltr <- function(bag_pltr, Y.name, newdata, type = "response", thre
   
   
   PROB_LIST <- lapply(bag_pltr$Glm_BAG, function(uu){
-  pred = predict.glm(uu, newdata = newdata, type = type)
+  pred <- predict.glm(uu, newdata = newdata, type = type)
   return(pred)  
   })
   PROB_MAT <- matrix(unlist(PROB_LIST), ncol = Bag, byrow = FALSE)
@@ -38,6 +38,7 @@ predict_bagg.pltr <- function(bag_pltr, Y.name, newdata, type = "response", thre
   confusion2 <-lapply(FINAL_PRED_IND2, function(cc) table(cc,newdata[, Y.name], dnn = c("Predicted Class", "Observed Class")))
   PRED_ERROR2 <- sapply(FINAL_PRED_IND2, function(uuu) mean( uuu != newdata[, Y.name]))    
   confusion1 <-lapply(FINAL_PRED_IND1, function(cc) table(cc,newdata[, Y.name], dnn = c("Predicted Class", "Observed Class")))
+  
   return(list(FINAL_PRED_IND1 = FINAL_PRED_IND1, FINAL_PRED_IND2 = FINAL_PRED_IND2,  PRED_ERROR1 = PRED_ERROR1, 
               PRED_ERROR2 = PRED_ERROR2, CONF1 = confusion1, CONF2 = confusion2, PRED_ERRORS_PBP = PRED_ERRORS_PBP,
               PRED_ERROR_PBP = PRED_ERROR_PBP))

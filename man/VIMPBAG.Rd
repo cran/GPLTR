@@ -19,7 +19,7 @@ VIMPBAG(BAGGRES, data, Y.name)
 }
 }
 \details{
- several choices for variable selection using the bagging procedure are proposed. A discussion about the scores of importance PIS, DIS, and DDIS is available in \code{Mbogning et al. 2014}
+ several choices for variable selection using the bagging procedure are proposed. A discussion about the scores of importance PIS, DIS, and DDIS is available in \code{Mbogning et al. 2015}
 }
 \value{ A list with 9 elements
 \item{PIS}{A list of length the length of the thresshold value used in the bagging procedure, containing the permutation importance score displayed in decreasing order for each thresshold value}
@@ -33,7 +33,7 @@ VIMPBAG(BAGGRES, data, Y.name)
 \item{Bagfinal}{The number of Bagging iterations used}
 }
 \references{
-Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection (submitted 2014)
+Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection. Human Heredity (To appear), (2015)
 }
 \author{
 Cyprien Mbogning

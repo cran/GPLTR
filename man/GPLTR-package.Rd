@@ -18,8 +18,8 @@ Fit a generalized partially linear tree-based regression model
 \tabular{ll}{
 Package: \tab GPLTR\cr
 Type: \tab Package\cr
-Version: \tab 1.1\cr
-Date: \tab 2014-12-19\cr
+Version: \tab 1.2\cr
+Date: \tab 2015-06-16\cr
 License: \tab GPL(>=2.0)\cr
 }
 
@@ -30,7 +30,7 @@ Cyprien Mbogning  and Wilson Toussile
 Maintainer: Cyprien Mbogning <cyprien.mbogning@gmail.com>
 }
 \references{
-Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection (submitted 2014)
+Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection. Human Heredity (To appear), (2015)
 
 Mbogning, C., Perdry, H., Toussile, W., Broet, P.: A novel tree-based procedure for deciphering the genomic spectrum of clinical disease entities. Journal of Clinical Bioinformatics 4:6, (2014) 
 

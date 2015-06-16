@@ -1,8 +1,8 @@
-#####################################################
+## ************************************************ ##
+##       Logistic Split function                    ##
+## ************************************************ ##
 
-##  Fonctions de split pour la régression logistique
-
-##  Initialize function
+##  Initialization function
 
 .logistic.init <- function(y, offset, params, wt)
 {
@@ -43,7 +43,6 @@
 {
   if(continuous)
   {
-    #	continuous x variable: do all the logistic regressions
     n <- nrow(y)
     goodness <- double(n-1)
     direction <- goodness
@@ -62,14 +61,11 @@
   else
   {
     x = x[,drop=TRUE]
-    #	Categorical X variable
-    #	First, find out what order to put the categories in, which
-    #	will be the order of the coefficients in this model
     tfit <- glm(y[,1]~factor(x)+offset(y[,2])-1, binomial, weights = wt)
     ngrp <- length(tfit$coef)
-    direction <- rank(rank(tfit$coef) + runif(ngrp, 0, 0.1)) # break ties
+    direction <- rank(rank(tfit$coef) + runif(ngrp, 0, 0.1)) 
     
-    xx <- direction[match(x, sort(unique(x)))] # relabel from small to large
+    xx <- direction[match(x, sort(unique(x)))] 
     goodness <- double(length(direction) - 1)
     for(i in 1:length(goodness))
     {
@@ -80,6 +76,3 @@
   
   list(goodness = goodness, direction = direction)
 }
-
-##################
-##

@@ -31,7 +31,7 @@
 
 \title {An Introduction to the GPLTR package}
 \author{Cyprien Mbogning\\
-          Inserm UNIT 669, France}
+          Inserm UNIT 1178, France}
 \date{\today}
 
 \begin{document}
@@ -262,6 +262,7 @@ The particularity of the PLTR model is that in addition with the tree part, the 
 \section{Compute the generalization error of the procedure}
 We can further compute the generalization error of the procedure. This can be computed via the function \Co{best.tree.CV} which can also provide the best tree based on a K-fold cross-validation procedure.
 <<>>=
+set.seed(150)
 pltr.burn_CV <- best.tree.CV(pltr.burn$tree, burn, Y.name, X.names, 
                   G.names, family = family, args.rpart = args.rpart,
                   epsi = 0.001, iterMax = 15, iterMin = 8, ncv = 10,
@@ -331,6 +332,7 @@ p_value$P.value
  
 <<treesbag, fig=TRUE, include=FALSE>>= 
  ##  ?bagging.pltr
+set.seed(250)
 
 Bag.burn <-  bagging.pltr(burn, Y.name, X.names, G.names, family, 
               args.rpart,epsi = 0.01, iterMax = 4, iterMin = 3, 
