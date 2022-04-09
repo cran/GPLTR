@@ -7,7 +7,7 @@
 .logistic.init <- function(y, offset, params, wt)
 {
   if(is.null(offset)) offset <- 0
-  if(any(y != 1 && y != 0)) stop('Response most be 0/1')
+  if(any(y != 1 & y != 0)) stop('Response most be 0/1')
   
   sfun <- function(yval, dev, wt, ylevel, digits)
   {

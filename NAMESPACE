@@ -1,3 +1,4 @@
 exportPattern("^[[:alpha:]]+")
 
 import(rpart , parallel)
+importFrom("stats", "as.formula", "binomial", "deviance", "glm", "pchisq", "predict", "predict.glm", "rnorm", "runif", "var")
