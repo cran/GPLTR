@@ -1,4 +1,4 @@
-32e0494033f14b674b113a8c8691dfd2 *DESCRIPTION
+ab1ce524ca9bbe220baab3166f1a8571 *DESCRIPTION
 46827c033cee8d65746214687134be1c *NAMESPACE
 7363dc5fe626e871e0b1953a28deeb0d *R/Imp_Score.R
 b02c1b228b4be201dc0efeeb0d4dff24 *R/Logistic_Split_Rpart.R
@@ -19,11 +19,11 @@ ba620ebfa789ff73ef02ac241aeaa07b *R/tree2glm.R
 a0a3b83343b731f3bc0a0685f7131cd0 *build/vignette.rds
 1021fe6a3cbf6462c7f6dcbd3e95ab5f *data/burn.rda
 4aa54352569110170b4b9f527be7b126 *data/data_pltr.rda
-3085237295b4c791a62b8dc793a1f331 *inst/doc/GPLTR-manual.pdf
+3d085ac2fd30cbfed8d879b5a4bc0b83 *inst/doc/GPLTR-manual.pdf
 8f155995f7724a3c5a023f0660b65b22 *inst/doc/intro.R
 72b9721bd6989bd4a9c17aa239dbceac *inst/doc/intro.Rnw
-e240e31c207f2df88d053f44ffffc579 *inst/doc/intro.pdf
-4c9e2a824fb37b47a4dc2d362327c6c0 *man/GPLTR-package.Rd
+cf7d85d17c1ce5cda780683037fb1759 *inst/doc/intro.pdf
+19f15b945e0edd23d6f9b037a1596b2f *man/GPLTR-package.Rd
 d6068ac90afe32dc6c8a9baa9f288336 *man/VIMPBAG.Rd
 585bfa7c03f2323c6836be2ce0dd4320 *man/bag.aucoob.Rd
 8c8af62eaa4d90ebe221e579cdeff756 *man/bagging.pltr.Rd
@@ -40,5 +40,5 @@ cdfdb54a8fcef0da8a3560f8f5fd3ae8 *man/predict_bagg.pltr.Rd
 e7f7d4e95a3e56a4c5d1139e8b72a6b6 *man/predict_pltr.Rd
 7ad8985c67a5030e8e81a88b88195c67 *man/tree2glm.Rd
 e130632ee69c02a41481a9c50df77731 *man/tree2indicators.Rd
-a49fbb2b0bad966b42f12311c6e2abf2 *vignettes/Bibliopltr.bib
+f499ad8efa4cd05841bf432d60d57e08 *vignettes/Bibliopltr.bib
 72b9721bd6989bd4a9c17aa239dbceac *vignettes/intro.Rnw

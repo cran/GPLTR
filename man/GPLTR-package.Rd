@@ -12,14 +12,16 @@ Fit a generalized partially linear tree-based regression model
   factors. 
   We also proposed an ensemble procedure based on the bagging to improve  
   prediction accuracy and computed several scores of importance for variable 
-  selection.
+  selection. See 'Cyprien Mbogning et al.'(2014)<doi:10.1186/2043-9113-4-6>,
+  'Cyprien Mbogning et al.'(2015)<doi:10.1159/000380850> 
+  for an overview of all the methods implemented in this package. 
 }
 \details{
 \tabular{ll}{
 Package: \tab GPLTR\cr
 Type: \tab Package\cr
-Version: \tab 1.2\cr
-Date: \tab 2015-06-16\cr
+Version: \tab 1.4\cr
+Date: \tab 2023-08-26\cr
 License: \tab GPL(>=2.0)\cr
 }
 
@@ -30,7 +32,7 @@ Cyprien Mbogning  and Wilson Toussile
 Maintainer: Cyprien Mbogning <cyprien.mbogning@gmail.com>
 }
 \references{
-Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection. Human Heredity (To appear), (2015)
+Mbogning, C., Perdry, H., Broet, P.: A Bagged partially linear tree-based regression procedure for prediction and variable selection. Human Heredity, 79(3-4):1 82-93 (2015)
 
 Mbogning, C., Perdry, H., Toussile, W., Broet, P.: A novel tree-based procedure for deciphering the genomic spectrum of clinical disease entities. Journal of Clinical Bioinformatics 4:6, (2014) 
 
