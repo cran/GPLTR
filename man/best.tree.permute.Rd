@@ -113,7 +113,8 @@ args.parallel = list(numWorkers = 1, type = "PSOCK")
 best_permute <- best.tree.permute(fit_pltr$tree, data_pltr, Y.name, X.names,
   G.names, B = 10, args.rpart = args.rpart, epsi = 0.001, iterMax = 5,              
              iterMin = 3, family = family, LEVEL = 0.05,LB = FALSE, 
-}                                   args.parallel = args.parallel)
+                                   args.parallel = args.parallel)
+}
 }
 
 \keyword{ documentation }
